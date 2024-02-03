@@ -1,0 +1,352 @@
+---
+title: "Project"
+author: "Lucas Villalba"
+date: "2024-01-13"
+output: html_document
+---
+
+# Capstone Project
+## Part of Google Data Analytics profesional certificate
+
+Working on how the Garmin personal database(could be any other brand) can help us throughout exams at the third level education with a healthy body equals to a healthy mind,
+
+The dataset the physical activities, habits, and routines of a male age 39 ~ 42 years old, from 2018 to 2022.
+
+How a mature student can cope throughout exams at third level education and success with a good health and fitness, 'mens sana in corpore sano'
+
+Also, it enhances our readiness for a future successful professional life after finishing our studies.
+
+
+* The methodology going through the Ask, Prepare, Process, Analyze, and Share phases of the data analysis process.
+
+## ASK
+
+# Five questions:
+
+1. What type of company does your client represent, and what are they asking you to accomplish?\  
+
+Personal interest in how I can cope with stress during exams
+
+2. What are the key factors involved in the business task you are investigating?\  
+
+Tracking my physical activity during the 4 (four) years, the same time period which took to completed my course. 
+
+3. What type of data will be appropriate for your analysis?\  
+
+All my physical activities during the time from 2018 to 2022.
+
+4. Where will you obtain that data?\  
+
+The data obtained from Garmin personal fitness database, downloaded via Garmin website from 2018 to 2022.
+
+5. Who is your audience, and what materials will help you present to them effectively?\  
+
+My audience a mature male group range age from 38 years old to 42 years old, who are attending a full time course, working part time and in a professional growth path.
+
+
+*Stating a business task clearly.*\  
+
+**How a healthy physical activity routine helps us to cope with stress during exams.**
+```{r, setting un CRAN environment}
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+install.packages("tidyverse")
+
+```
+
+* Importing data from a real dataset.
+```{r, importing data}
+activities_df <-
+  read.csv("~/cloud/project/Activities.csv")
+str(activities_df)
+```
+
+* Documenting any data cleaning that you perform on the data set.
+```{r, data cleaning}
+install.packages("tidyverse")
+install.packages("skimr")
+install.packages("janitor")
+library(tidyverse)
+library(skimr)
+library(janitor)
+```
+
+* Quick visualization of the raw data.
+```{r, creating a visualization }
+ggplot(data = activities_df) +
+  geom_point(mapping = aes(x = Activity.Type, y = Calories, color = Activity.Type)) +
+  labs(title = "All the activities by Calories") +
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+# Prepare
+
+* Where is your data located?  The Data is located in a sub-folder no related to the project, for this reason is good to save the data in the following path "R/Coursera/Project" this is part of good habits data structure
+
+```{r, data relocate in Project subfolder}
+write.csv(activities_df, file = "~/cloud/project/activities1.csv", na = "NA")
+
+```
+
+* How is the data organized?  Data frame is organized in rows and columns, with 854 observations (rows) and 42 variables (columns), each observation is a physical activity with variables like:
+```{r, variables}
+colnames(activities_df)
+```
+
+
+```{r, data overview}
+skim_without_charts(activities_df)
+```
+
+
+* Are there issues with bias or credibility in this data? Does your data ROCCC?
+ The data has tracked and collected via smart watch Garmin model Forerunner 25 and forerunner 35.
+ The data is Reliable as the device to collect the data uses a GPS and sensors for standard accuracy level.
+ The data is Original direct from personal Garmin database.
+ The data is comprehensive, physical activities since 2018 to 2022, same time the subject was attending 4 years  full time undergraduate course.
+ Current. the data is actual for the time period to perform the analysis.
+ Cited, the data is from a trusted private service with customer support and trusted system.
+
+* How are you addressing licensing, privacy, security, and accessibility?
+The data frame is a personal data, saved in a sub folder without security measures, free access.
+
+* How did you verify the data's integrity?
+The data has been downloaded from a Garmin website, access by username and password to download it.
+The data has been collected via Garmin smart watch since 2018 to 2022 of an male adult person age 40yrs old, same time the subject was attending to undergraduate course 4 years full time.
+
+* How does it help you answer your question?
+Yes, the data as a track of all the physical activities of the subject from 2018 to 2022, same time the subject was attending college.
+
+* Are there any problems with the data?
+No problem with the data.
+
+Key tasks
+
+* Download data and store it appropriately.
+* Identify how it’s organized.
+* Sort and filter the data.
+* Determine the credibility of the data.
+
+Deliverable
+
+* A description of all data sources used
+
+# Process
+
+* What tools are you choosing and why?  I am choosing RStudio RStudio
+2023.12.0 Build 369
+© 2009-2023 Posit Software, PBC
+I find it more efficient for data visualization, cleaning and data wrangling, all with a same document in RMarkdown. 
+
+* Have you ensured your data’s integrity?  The source of the data is trusted.
+
+* What steps have you taken to ensure that your data is clean?  Data cleaning steps:
+```{r, Data cleaning detailed process}
+
+# Select the variables for the analysis.
+trimmed_activities_2018_2022<-activities_df %>%
+  select(Activity.Type, Date, Calories, Avg.HR, Avg.Stress)
+
+# Check the data type of the variables.
+str(trimmed_activities_2018_2022$Date)
+
+# Change the variable Date (character type) to date(date type) .
+trimmed_activities_2018_2022$date <- as.Date(trimmed_activities_2018_2022$Date)
+
+# Change the variable Calories(character type) to calories(numeric type).
+trimmed_activities_2018_2022$calories <- as.numeric(trimmed_activities_2018_2022$Calories)
+
+# Change the variable Avg.HR (character type) to avg_hr (numeric type).
+trimmed_activities_2018_2022$avg_hr <- as.numeric(trimmed_activities_2018_2022$Avg.HR)
+
+# Change the variable Avg.Stress (character type) to avg_stress (numeric type).
+trimmed_activities_2018_2022$avg_stress <- as.numeric(trimmed_activities_2018_2022$Avg.Stress)
+
+# Change the variable name Activity.Type to act_type and delet from the data frame.
+trimmed_activities_2018_2022 <- trimmed_activities_2018_2022 %>%
+  mutate(act_type = Activity.Type) %>%
+  select(-Activity.Type)
+
+# finally select the new order for the variables for analysis.
+act_2018_2022 <- trimmed_activities_2018_2022 %>%
+  select(act_type, date, avg_stress, avg_hr, calories)
+act_2018_2022$date <- as.Date(act_2018_2022$date)
+class(act_2018_2022$date)
+```
+
+* How can you verify that your data is clean and ready to analyze?  Check data structure.
+```{r check the structure to finish step of the data wrangling, warning=FALSE}
+# Overview of the data frame
+str(act_2018_2022)
+colnames(act_2018_2022)
+skim_without_charts(act_2018_2022)
+
+# dealing with missing values
+# the device(forerunner 35) does not read stress so for three first year was no data, so we can see a small data set with out NA or missing values, decided to keep the NA and using calories variable.
+drop_na(act_2018_2022)
+
+# Data visualization of the data cleaning results
+ggplot(data = act_2018_2022) +
+  geom_point(mapping = aes(x = date, y = act_type, color = act_type, size = calories)) +
+  labs(title = "Activities by Calories") +
+  theme(axis.text.x = element_text(angle = 45))
+
+# Data manipulation, group the data by academic calendar year as following:
+
+# Calendar year from Sept 2018 to Jun 2019
+act_2018_2019 <- act_2018_2022[act_2018_2022$date > "2018-09-01" & act_2018_2022$date < "2019-06-30",]
+
+# Calendar year from Sept 2019 to Jun 2020
+act_2019_2020 <- act_2018_2022[act_2018_2022$date > "2019-09-01" & act_2018_2022$date < "2020-06-30",]
+
+# Calendar year from Sept 2020 to Jun 2021
+act_2020_2021 <- act_2018_2022[act_2018_2022$date > "2020-09-01" & act_2018_2022$date < "2021-06-30",]
+
+# Calendar year from Sept 2021 to Jun 2022
+act_2021_2022 <- act_2018_2022[act_2018_2022$date > "2021-09-01" & act_2018_2022$date < "2022-06-30",]
+
+# Visualizations by academic year
+# Activities 1st year 2018 2019
+ggplot(data = act_2018_2019) +
+  geom_point(mapping = aes(x = date, y = act_type, color = act_type, size = calories)) +
+  labs(title = "Activities by date in the 1st academic year(2018 2019)") +
+  theme(axis.text.x = element_text(angle = 45))
+
+# Activities 2nd year 2019 2020
+ggplot(data = act_2019_2020) +
+  geom_point(mapping = aes(x = date, y = act_type, color = act_type, size = calories)) +
+  labs(title = "Activities by date in the 2nd academic year(2019 2020)")+
+  theme(axis.text.x = element_text(angle = 45))
+
+# Activities 3rd year 2020 2021
+ggplot(data = act_2020_2021) +
+  geom_point(mapping = aes(x = date, y = act_type, color = act_type, size = calories)) +
+  labs(title = "Activities by date in the 3rd academic year(2020 2021)") +
+  theme(axis.text.x = element_text(angle = 45))
+
+# Activities 4th year 2021 2022
+ggplot(data = act_2021_2022) +
+  geom_point(mapping = aes(x = date, y = act_type, color = act_type, size = calories)) +
+  labs(title = "Activities by date in the 4th academic year(2021 2022)") +
+  theme(axis.text.x = element_text(angle = 45))
+
+```
+
+
+* Have you documented your cleaning process so you can review and share those results?
+The data still have 35 missing values, but this do not affect the analysis due the calories variable is taking in account for this.
+Key tasks
+* Check the data for errors.
+* Choose your tools.
+* Transform the data so you can work with it effectively.
+* Document the cleaning process.
+
+Deliverable
+Documentation of any cleaning or manipulation of data
+
+# Analyze
+
+* Analyzing the data with visualizations year by year.
+
+* Creating data visualizations from your analysis.
+```{r, Analysing the data}
+# Calculate the start date and the finish date
+min_d_2018<-min(act_2018_2019$date)
+max_d_2019<-max(act_2018_2019$date)
+
+# Visualization of the year with date and exams period
+p<-ggplot(data = act_2018_2019) +
+  geom_point(mapping = aes(x = date, y = act_type, color = act_type, size = calories)) +
+  labs(title = "Activities by date in the 1st year", caption=paste0("Data from: ", min_d_2018, " to ", max_d_2019), x = "Date", y = "Activity type") +
+  theme(axis.text.x = element_text(angle = 45))
+  
+# adding the exams period
+p + annotate(geom = "text", x = as.Date("2019-01-11"), y =(act_2018_2019$act_type), label = "Exams period", vjust = -2, color = "orange")
+
+```
+
+
+## 1st year
+For the first year, the exam period was predicted in January, no repeating exams period as was not re-sitting.
+**"Exams period"** shows the lack of physical activity and this trigger stress as new physical activities were in place after the exams period, as *walking*.
+
+```{r}
+# Calculate the start date and the finish date
+min_d_2019<-min(act_2019_2020$date)
+max_d_2020<-max(act_2019_2020$date)
+
+# Visualization of the year with date and exams period
+p<-ggplot(data = act_2019_2020) +
+  geom_point(mapping = aes(x = date, y = act_type, color = act_type, size = calories)) +
+  labs(title = "Activities by date in the 2nd year", caption=paste0("Data from: ", min_d_2019, " to ", max_d_2020), x = "Date", y = "Activity type") +
+  theme(axis.text.x = element_text(angle = 45))
+  
+# adding the exams period
+p + annotate(geom = "text", x = as.Date("2020-01-02"), y =(act_2019_2020$act_type), label = "Exams period", vjust = -2, color = "orange")
+```
+
+
+## 2nd year
+For the second year, the exam period was predicted in January, no repeating exams period as was not re-sitting.
+**"Exams period"** shows more physical activity compare with previous year, more calories as more physical activities were in place during the exams period *Calories 750*.
+
+
+
+```{r}
+# Calculate the start date and the finish date
+min_d_2020<-min(act_2020_2021$date)
+max_d_2021<-max(act_2020_2021$date)
+
+# Visualization of the year with date and exams period
+p<-ggplot(data = act_2020_2021) +
+  geom_point(mapping = aes(x = date, y = act_type, color = act_type, size = calories)) +
+  labs(title = "Activities by date in the 3rd year", caption=paste0("Data from: ", min_d_2020, " to ", max_d_2021), x = "Date", y = "Activity type") +
+  theme(axis.text.x = element_text(angle = 45))
+  
+# adding the exams period
+p + annotate(geom = "text", x = as.Date("2021-01-02"), y =(act_2020_2021$act_type), label = "Exams period", vjust = -2, color = "orange")
+```
+
+
+## 3rd year
+For the third year, the exam period was predicted in January, no repeating exams period as was not re-sitting.
+**"Exams period"** shows the continuity of physical activity, this keep calories consumption levels, and new physical activities were in place at the end of exams period, as *Street Running* and *Strength training*.
+
+```{r}
+# Calculate the start date and the finish date
+min_d_2021<-min(act_2021_2022$date)
+max_d_2022<-max(act_2021_2022$date)
+
+# Visualization of the year with date and exams period
+p<-ggplot(data = act_2021_2022) +
+  geom_point(mapping = aes(x = date, y = act_type, color = act_type, size = calories)) +
+  labs(title = "Activities by date in the 4th year", caption=paste0("Data from: ", min_d_2021, " to ", max_d_2022), x = "Date", y = "Activity type") +
+  theme(axis.text.x = element_text(angle = 45))
+  
+# adding the exams period
+p + annotate(geom = "text", x = as.Date("2022-01-02"), y =(act_2021_2022$act_type), label = "Exams period", vjust = -2, color = "orange")
+```
+
+
+## 4th year
+For the fourth year, the exam period was predicted in January, no repeating exams period as was not re-sitting.
+**"Exams period"** shows a decrease of physical activity, a high stress post exams period and a new physical activities added in place after the exams period, as *Yoga* and *Pilates*.
+
+## Final Conclusion:
+For the final result of the analysis stated the physical activities with high intensity(hart rate) and workout(calories) as *Running*, *Cycling*, *Cardio* activities, which put the subject in a **high stress**, on the other hand, the activities post high stress period are more accurate in relation to **cope with stress** as *Walking*, *Yoga* and *Pilates*.
+
+
+* Summarizing key findings from your analysis.
+
+* Documenting your conclusions and recommendations.
+
+* Creating and publishing your case study.
+
+
+Deliverable:
+1. A clear statement of the business task you have selected to investigate
+2. A description of all data sources used
+3. Documentation of any cleaning or manipulation of data
+4. A summary of your analysis
+5. Supporting visualizations and key findings
+6. Based on what you discover, a list of additional deliverables you think would be helpful to include for further exploration
+7. Your top high-level insights based on your analysis
